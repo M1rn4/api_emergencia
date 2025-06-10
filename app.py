@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import numpy as np
+import os
 
 app = Flask(__name__)
 
@@ -12,7 +13,7 @@ def detectar_emergencia():
         temp = data.get("temp")      # temperatura promedio
         actividad = data.get("actividad")  # run, sit o walk
 
-        # Reglas básicas
+        # Reglas simples adaptadas al contexto de la actividad
         if spo2 < 90 and hr > 170 and temp > 38:
             riesgo = "multi-riesgo"
         elif spo2 < 90:
@@ -35,15 +36,17 @@ def detectar_emergencia():
 
 def generar_recomendacion(riesgo, actividad):
     if riesgo == "multi-riesgo":
-        return "Suspender actividad inmediatamente y buscar asistencia médica."
+        return "🚨 Suspender actividad inmediatamente y buscar asistencia médica."
     elif riesgo == "hipoxia":
-        return "Verificar el sensor y oxigenación. Reducir la actividad física."
+        return "⚠️ Verificar el sensor y oxigenación. Reducir la actividad física."
     elif riesgo == "taquicardia":
-        return "Descansar. Si persiste, buscar evaluación médica."
+        return "💓 Descansar. Si persiste, buscar evaluación médica."
     elif riesgo == "hipertermia":
-        return "Hidratarse y buscar un lugar fresco. Monitorear temperatura."
+        return "🌡 Hidratarse y buscar un lugar fresco. Monitorear temperatura."
     else:
-        return "Sin riesgos detectados."
+        return "✅ Sin riesgos detectados."
 
+# 🔧 Adaptado para Render (no usar solo debug en local)
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
